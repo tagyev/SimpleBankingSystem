@@ -44,14 +44,14 @@ public class GlobalExceptionHandle {
                 .build();
     }
 
-    @ExceptionHandler(Exception.class) // catch-all
-    public ExceptionResponse handleGlobalException(Exception ex) {
-        log.error("Unexpected error: {}", ex.getMessage(), ex);
-        return ExceptionResponse.builder()
-                .timestamp(LocalDateTime.now())
-                .message("Internal server error")
-                .details("Unexpected error occurred")
-                .build();
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ExceptionResponse handleGlobalException(Exception ex) {
+//        log.error("Unexpected error: {}", ex.getMessage(), ex);
+//        return ExceptionResponse.builder()
+//                .timestamp(LocalDateTime.now())
+//                .message("Internal server error")
+//                .details("Unexpected error occurred")
+//                .build();
+//    }
 }
 

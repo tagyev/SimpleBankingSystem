@@ -2,7 +2,6 @@ package com.example.SimpleBankingSystem.service.impl;
 
 import com.example.SimpleBankingSystem.dao.entity.TransactionLogEntity;
 import com.example.SimpleBankingSystem.dao.repository.TransactionRepository;
-import com.example.SimpleBankingSystem.dto.request.TransactionLogRequest;
 import com.example.SimpleBankingSystem.dto.response.TransactionLogResponse;
 import com.example.SimpleBankingSystem.exception.TransactionNotFoundException;
 import com.example.SimpleBankingSystem.mapper.TransactionLogMapper;
@@ -18,13 +17,6 @@ import static lombok.AccessLevel.PRIVATE;
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class TransactionLogServiceImpl implements TransactionLogService {
     TransactionRepository repository;
-
-    @Override
-    public TransactionLogResponse create(TransactionLogRequest request) {
-        TransactionLogEntity entity = TransactionLogMapper.requestToEntity(request);
-        TransactionLogEntity saved = repository.save(entity);
-        return TransactionLogMapper.entityToResponse(saved);
-    }
 
     @Override
     public TransactionLogResponse getById(Long id) {

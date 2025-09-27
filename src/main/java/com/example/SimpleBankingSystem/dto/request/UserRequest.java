@@ -1,9 +1,6 @@
 package com.example.SimpleBankingSystem.dto.request;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,16 +15,14 @@ import static lombok.AccessLevel.PRIVATE;
 public class UserRequest {
 
     @NotBlank
-    @Max(30)
-    @Min(2)
+    @Size(min = 2, max = 30)
     String firstName;
 
     @NotBlank
-    @Max(30)
-    @Min(2)
+    @Size(min = 2, max = 30)
     String lastName;
 
-    @NotBlank
+    @NotNull
     @Min(18)
     @Positive
     Integer age;

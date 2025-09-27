@@ -3,6 +3,7 @@ package com.example.SimpleBankingSystem.dto.request;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,12 +16,10 @@ import static lombok.AccessLevel.PRIVATE;
 @NoArgsConstructor
 @FieldDefaults(level = PRIVATE)
 public class UpdateUserRequest {
-    @Max(30)
-    @Min(2)
+    @Size(min = 2, max = 30)
     String firstName;
 
-    @Max(30)
-    @Min(2)
+    @Size(min = 2, max = 30)
     String lastName;
 
     @Min(18)

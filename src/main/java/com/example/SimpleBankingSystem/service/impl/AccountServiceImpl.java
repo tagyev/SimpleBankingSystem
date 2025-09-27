@@ -19,6 +19,7 @@ import com.example.SimpleBankingSystem.service.abstraction.AccountService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -26,6 +27,7 @@ import java.math.BigDecimal;
 import static lombok.AccessLevel.PRIVATE;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class AccountServiceImpl implements AccountService {
@@ -35,64 +37,65 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountResponse createAccount(AccountRequest request) {
+        log.info("AccountServiceImpl.createAccount.start: {}",request);
         UserEntity userEntity = fetchUserIfExist(request.getUserId());
         AccountEntity accountEntity = AccountMapping.requestToEntity(request);
         repository.save(accountEntity);
-
-        TransactionLogEntity log = TransactionLogEntity.builder()
-                .userId(userEntity.getId())
-                .accountId(accountEntity.getId())
-                .status(TransactionStatus.CREATED)
-                .build();
-        transactionLogRepository.save(log);
-
+        log.info("AccountServiceImpl.createAccount.close: {}",request);
         return AccountMapping.entityToResponse(accountEntity);
     }
 
+    @Transactional
     @Override
     public AccountResponse deposit(Long id, UpdateAccountRequest request) {
-        if (request.getAmount().compareTo(BigDecimal.ZERO)<0)
+        log.info("AccountServiceImpl.deposit.start: {}",request);
+        if (request.getAmount().compareTo(BigDecimal.ZERO)<=0)
             throw new InvalidAmountException("Deposit amount must be greater than zero");
         AccountEntity accountEntity = fetchAccountIfExist(id);
         accountEntity.setBalance(accountEntity.getBalance().add(request.getAmount()));
         repository.save(accountEntity);
 
-        TransactionLogEntity log = TransactionLogEntity.builder()
-                .userId(accountEntity.getUserId()) // AccountEntity-də userId varsa
+        TransactionLogEntity logs = TransactionLogEntity.builder()
+                .userId(accountEntity.getUserId())
                 .accountId(accountEntity.getId())
                 .status(TransactionStatus.DEPOSIT)
+                .amount(request.getAmount())
                 .build();
-        transactionLogRepository.save(log);
-
+        transactionLogRepository.save(logs);
+        log.info("AccountServiceImpl.deposit.close: {}",request);
         return AccountMapping.entityToResponse(accountEntity);
     }
 
+    @Transactional
     @Override
     public AccountResponse withdraw(Long id, UpdateAccountRequest request) {
-        if (request.getAmount().compareTo(BigDecimal.ZERO)<0)
+        log.info("AccountServiceImpl.withdraw.start: {}",request);
+        if (request.getAmount().compareTo(BigDecimal.ZERO)<=0)
             throw new InvalidAmountException("Withdraw amount must be greater than zero");
         AccountEntity accountEntity = fetchAccountIfExist(id);
         accountEntity.setBalance(accountEntity.getBalance().subtract(request.getAmount()));
         repository.save(accountEntity);
 
-        TransactionLogEntity log = TransactionLogEntity.builder()
+        TransactionLogEntity logs = TransactionLogEntity.builder()
                 .userId(accountEntity.getUserId())
                 .accountId(accountEntity.getId())
+                .amount(request.getAmount())
                 .status(TransactionStatus.WITHDRAW)
                 .build();
-        transactionLogRepository.save(log);
-
+        transactionLogRepository.save(logs);
+        log.info("AccountServiceImpl.withdraw.start: {}",request);
         return AccountMapping.entityToResponse(accountEntity);
     }
 
     @Transactional
     @Override
     public AccountResponse transfer(Long fromId,Long toId, UpdateAccountRequest request) {
+        log.info("AccountServiceImpl.transfer.start: {}",request);
         AccountEntity fromAccount = fetchAccountIfExist(fromId);
         AccountEntity toAccount = fetchAccountIfExist(toId);
         if (fromAccount.getBalance().compareTo(request.getAmount())<0)
             throw new InsufficientBalanceException("Insufficient balance");
-        if (request.getAmount().compareTo(BigDecimal.ZERO)<0)
+        if (request.getAmount().compareTo(BigDecimal.ZERO)<=0)
             throw new InvalidAmountException("Transfer amount must be greater than zero");
         if (fromAccount.getBalance().compareTo(request.getAmount())>0 &&
                                         request.getAmount().compareTo(BigDecimal.ZERO)>0)
@@ -104,17 +107,20 @@ public class AccountServiceImpl implements AccountService {
         TransactionLogEntity fromLog = TransactionLogEntity.builder()
                 .userId(fromAccount.getUserId())
                 .accountId(fromAccount.getId())
+                .amount(request.getAmount())
                 .status(TransactionStatus.TRANSFER)
                 .build();
 
         TransactionLogEntity toLog = TransactionLogEntity.builder()
                 .userId(toAccount.getUserId())
                 .accountId(toAccount.getId())
+                .amount(request.getAmount())
                 .status(TransactionStatus.TRANSFER)
                 .build();
 
         transactionLogRepository.save(fromLog);
         transactionLogRepository.save(toLog);
+        log.info("AccountServiceImpl.transfer.start: {}",request);
         return AccountMapping.entityToResponse(fromAccount);
     }
 

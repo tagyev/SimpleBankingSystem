@@ -1,11 +1,13 @@
 package com.example.SimpleBankingSystem.dto.request;
 
 import com.example.SimpleBankingSystem.enums.TransactionStatus;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
+import java.math.BigDecimal;
 
 import static lombok.AccessLevel.PRIVATE;
 
@@ -14,9 +16,9 @@ import static lombok.AccessLevel.PRIVATE;
 @NoArgsConstructor
 @FieldDefaults(level = PRIVATE)
 public class TransactionLogRequest {
-    @NotBlank
+    @NotNull
     Long userId;
-    @NotBlank
+    @NotNull
     Long accountId;
     TransactionStatus status;
 }

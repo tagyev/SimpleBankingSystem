@@ -2,8 +2,6 @@ package com.example.SimpleBankingSystem.dao.entity;
 
 import com.example.SimpleBankingSystem.enums.AccountStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
